@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Review Desk</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef1ec;--surface:#fbfcfa;--sunk:#e4eae4;--ink:#17302b;--mute:#5d716b;--line:#d5ddd6;--accent:#17302b;--on:#fbfcfa;
+--review:#b87400;--review-bg:#fbefd2;--changes:#b3361f;--changes-bg:#fadfd8;--approved:#1f7a4d;--approved-bg:#d8f0e3;--sh:0 1px 2px rgba(23,48,43,.08),0 4px 12px rgba(23,48,43,.06);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b18;--surface:#172623;--sunk:#0b1512;--ink:#e6efe9;--mute:#93a8a1;--line:#2a3d38;--accent:#e6efe9;--on:#0f1b18;--review:#f0b84a;--review-bg:#3a2e12;--changes:#ff8f78;--changes-bg:#40201a;--approved:#5fd199;--approved-bg:#163828;--sh:0 1px 2px rgba(0,0,0,.4)}}
+:root[data-theme="dark"]{--bg:#0f1b18;--surface:#172623;--sunk:#0b1512;--ink:#e6efe9;--mute:#93a8a1;--line:#2a3d38;--accent:#e6efe9;--on:#0f1b18;--review:#f0b84a;--review-bg:#3a2e12;--changes:#ff8f78;--changes-bg:#40201a;--approved:#5fd199;--approved-bg:#163828;--sh:0 1px 2px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--review);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 64px}
+.top{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+h1{margin:0;font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.sub{color:var(--mute);margin:6px 0 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:9px;font-weight:600;transition:border-color .15s,background .15s}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--brand,var(--accent));color:var(--brand-on,var(--on));border-color:var(--brand,var(--accent))}
+.btn.ghost{background:none}
+.btn.danger{color:var(--changes)}
+.menu{position:relative}.menu summary{list-style:none}.menu summary::-webkit-details-marker{display:none}
+.pop{position:absolute;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--sh);padding:6px;z-index:20;min-width:170px;display:grid}
+.pop button{background:none;border:0;text-align:left;padding:8px 10px;border-radius:7px}.pop button:hover{background:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:10px}
+.stat{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;box-shadow:var(--sh);border-top:4px solid var(--line)}
+.stat b{display:block;font-size:30px;font-weight:800;line-height:1.1}.stat span{color:var(--mute);font-size:13px}
+.stat.on{outline:2px solid var(--ink)}
+.stat.review{border-top-color:var(--review)}.stat.changes{border-top-color:var(--changes)}.stat.approved{border-top-color:var(--approved)}
+.prog{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:13px;margin:0 0 18px}
+.bar{flex:1;height:8px;border-radius:9px;background:var(--sunk);overflow:hidden}.bar i{display:block;height:100%;background:var(--approved);transition:width .3s}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tools input,.tools select,.fld input,.fld select,.fld textarea{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 10px;min-width:0;width:100%}
+.tools input{flex:1 1 220px;width:auto}.tools select{width:auto}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 14px;font-weight:600}.seg button.on{background:var(--accent);color:var(--on)}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;align-items:start}
+.col{background:var(--sunk);border-radius:14px;padding:10px;min-height:140px}
+.col.over{outline:2px dashed var(--ink)}
+.col h3{display:flex;justify-content:space-between;margin:2px 4px 10px;font-size:15px}
+.col h3 span{color:var(--mute);font-weight:400}
+.col .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:9px;box-shadow:var(--sh);cursor:grab}
+.card:hover{border-color:var(--ink)}.card.drag{opacity:.4}
+.ct{font-weight:600;line-height:1.3}
+.cm{display:flex;align-items:center;gap:8px;margin:7px 0;color:var(--mute);font-size:13px}
+.cf{display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--mute)}.cf .sp{flex:1}
+.av{width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-size:11px;font-weight:700;flex:none}
+.pr{width:9px;height:9px;border-radius:50%;background:var(--line)}.p-high{background:var(--changes)}.p-normal{background:var(--review)}
+.late{color:var(--changes);font-weight:600}
+.list{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden;box-shadow:var(--sh)}
+.item{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:13px 18px;border:0;border-bottom:1px solid var(--line);width:100%;text-align:left;background:none}
+.item:last-child{border-bottom:0}.item:hover{background:var(--bg)}
+.item .m{color:var(--mute);font-size:13px}.item .r{grid-row:1/3;grid-column:2;display:grid;justify-items:end;align-content:center;gap:3px}
+.pill{font-size:12px;font-weight:600;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.pill.review{background:var(--review-bg);color:var(--review)}.pill.changes{background:var(--changes-bg);color:var(--changes)}.pill.approved{background:var(--approved-bg);color:var(--approved)}
+.empty{padding:34px 18px;text-align:center;color:var(--mute)}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);padding:0;width:min(440px,calc(100vw - 24px))}
+dialog::backdrop{background:rgba(10,20,17,.5)}
+dialog.drawer{width:min(520px,100vw);height:100%;max-height:100%;margin:0 0 0 auto;border-radius:0;border-width:0 0 0 1px;overflow:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.dh{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:16px 20px 6px}
+.db{padding:6px 20px 24px}
+.tin{width:100%;border:1px solid transparent;background:none;font-size:22px;font-weight:800;letter-spacing:-.02em;padding:4px 6px;border-radius:8px}
+.tin:hover,.tin:focus{border-color:var(--line);background:var(--bg)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.fld{display:grid;gap:4px;font-size:13px;color:var(--mute)}.fld.full{grid-column:1/-1}.fld textarea{min-height:76px;resize:vertical}
+.stseg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0 4px}
+.stseg button{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 4px;font-size:13px;font-weight:600}
+.stseg button.on.review{background:var(--review-bg);color:var(--review);border-color:var(--review)}
+.stseg button.on.changes{background:var(--changes-bg);color:var(--changes);border-color:var(--changes)}
+.stseg button.on.approved{background:var(--approved-bg);color:var(--approved);border-color:var(--approved)}
+.thread{display:grid;gap:8px;margin:10px 0}
+.c{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;white-space:pre-wrap;word-break:break-word}
+.c small{display:block;color:var(--mute);font-size:12px}.c.sys{background:var(--bg);color:var(--mute);border-style:dashed}.c.client{border-left:4px solid var(--review)}
+.saved{color:var(--approved);font-size:13px;min-width:46px}
+.toasts{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;gap:8px;z-index:50}
+.toast{background:var(--accent);color:var(--on);padding:9px 14px;border-radius:99px;font-weight:600;display:flex;gap:12px;align-items:center}
+.toast button{background:none;border:0;text-decoration:underline;font-weight:700;color:inherit}
+.chip{font-size:13px;color:var(--mute);border:1px solid var(--line);border-radius:99px;padding:3px 11px;background:var(--surface)}.chip:empty{display:none}.chip.live::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--approved);margin-right:6px}.card{transition:transform .12s,box-shadow .12s}.card:hover{transform:translateY(-1px)}.shared [data-local]{display:none}[hidden]{display:none!important}.empty p{max-width:420px;margin:6px auto 16px}button:disabled,input:disabled,select:disabled,textarea:disabled{opacity:.6;cursor:not-allowed}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><h1 id="brand">Review Desk</h1><p class="sub">Every deliverable, who it’s with, and what’s blocking sign-off.</p></div>
+    <div class="row">
+      <span class="chip" id="chip"></span><button class="btn ghost" id="cfg" hidden>Settings</button><button class="btn ghost" id="theme" aria-label="Switch between light and dark">Theme</button>
+      <details class="menu" id="data"><summary class="btn">Data</summary><div class="pop">
+        <button data-a="csv">Export CSV</button><button data-a="json">Back up (JSON)</button>
+        <button data-a="import" data-local>Restore from backup</button><button data-a="demo">Load demo data</button><button data-a="clear" data-local>Clear everything</button>
+      </div></details>
+      <button class="btn primary" id="new">New deliverable <small>(N)</small></button>
+    </div>
+  </header>
+  <section class="stats" id="stats"></section>
+  <div class="prog" id="prog"></div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Search title, client or owner  ( / )" aria-label="Search">
+    <select id="client" aria-label="Client"></select>
+    <select id="sort" aria-label="Sort"><option value="due">Sort: due date</option><option value="new">Sort: newest</option><option value="priority">Sort: priority</option><option value="client">Sort: client</option></select>
+    <div class="seg"><button data-v="board">Board</button><button data-v="list">List</button></div>
+  </div>
+  <main id="main"></main>
+</div>
+<dialog id="quick"></dialog><dialog id="cfgdlg"></dialog>
+<dialog id="drawer" class="drawer"></dialog>
+<input type="file" id="file" accept="application/json" hidden>
+<div class="toasts" id="toasts"></div>
+<script>
+(()=>{
+"use strict";
+const KEY="reviewdesk.v2",THEME="reviewdesk.theme";
+const ST=[{k:"review",n:"Awaiting review"},{k:"changes",n:"Changes requested"},{k:"approved",n:"Approved"}];
+const LBL=Object.fromEntries(ST.map(s=>[s.k,s.n]));
+const TYPES=["Design","Copy","Video","Development","Strategy","Other"];
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=()=>Math.random().toString(36).slice(2,10);
+const iso=d=>d.toISOString().slice(0,10);
+const inDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return iso(d)};
+const fmt=d=>d?new Date(d+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short"}):"No date";
+const fmtT=t=>new Date(t).toLocaleString(undefined,{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"});
+const late=i=>i.status!=="approved"&&i.due&&i.due<iso(new Date());
+const ls={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+
+function seed(){
+  const sys=t=>({id:uid(),kind:"sys",who:"System",text:t,at:Date.now()-9e5});
+  const mk=(title,client,type,owner,due,status,priority,notes,cm=[])=>({id:uid(),title,client,type,owner,due,status,priority,notes,link:"",created:Date.now()-Math.random()*6e8,comments:[sys("Sent for review."),...cm]});
+  return [
+    mk("Homepage redesign, round 2","Northwind Coffee","Design","Priya",inDays(2),"review","high","Hero and menu section updated from last round’s notes.",[{id:uid(),kind:"agency",who:"Priya",text:"Updated hero and menu section.",at:Date.now()-864e5}]),
+    mk("Spring campaign video cut","Lumen Skincare","Video","Marco",inDays(-1),"changes","high","",[{id:uid(),kind:"client",who:"Lumen team",text:"Logo needs to stay on screen longer in the last 5 seconds.",at:Date.now()-432e5}]),
+    mk("Q2 email sequence (4 emails)","Orbit Fitness","Copy","Dana",inDays(5),"review","normal",""),
+    mk("Brand guidelines PDF","Northwind Coffee","Design","Priya",inDays(-6),"approved","normal",""),
+    mk("Landing page copy","Orbit Fitness","Copy","Dana",inDays(7),"approved","low",""),
+    mk("Pricing page wireframes","Lumen Skincare","Strategy","Marco",inDays(3),"review","low","")
+  ];
+}
+const UIKEY="reviewdesk.ui",BKEY="reviewdesk.brand";
+const S={items:[],ui:{view:"board",filter:"all",client:"all",sort:"due",q:""},openId:null,mode:"local",db:null,canWrite:true,isAdmin:true,loading:false,brand:null,raw:{items:[],comments:[],notes:{}},
+  load(){try{const d=JSON.parse(ls.get(KEY));if(d&&Array.isArray(d.items))this.items=d.items}catch(e){}try{Object.assign(this.ui,JSON.parse(ls.get(UIKEY))||{})}catch(e){}this.ui.q=""},
+  save(){ls.set(UIKEY,JSON.stringify(this.ui));if(this.mode==="local")ls.set(KEY,JSON.stringify({items:this.items}))},
+  get(id){return this.items.find(i=>i.id===id)},
+  fail(e){toast(e&&e.code==="invalid_argument"?"You have view-only access to this page":"Couldn’t save that. Please try again.")},
+  w(p){return this.db.doc(p)},
+  put(i){if(this.mode!=="db")return this.save();const {comments,notes,...d}=i;this.w("deliverables/"+i.id).set(d).catch(e=>this.fail(e))},
+  comment(i,c){c={id:uid(),itemId:i.id,at:Date.now(),...c};if(this.mode!=="db"){i.comments.push(c);return this.save()}this.w("comments/"+c.id).set(c).catch(e=>this.fail(e))},
+  log(i,t){this.comment(i,{kind:"sys",who:"System",text:t})},
+  create(i){i.comments=[];this.items.push(i);this.put(i);this.log(i,"Sent for review.")},
+  setNotes(i,v){i.notes=v;if(this.mode!=="db")return this.save();this.w("internal/"+i.id).set({notes:v}).catch(e=>this.fail(e))},
+  setStatus(i,st){if(i.status===st)return;i.status=st;this.put(i);this.log(i,{review:"Sent back to review.",changes:"Changes requested.",approved:"Approved."}[st])},
+  del(i){const x=this.items.indexOf(i);if(x>-1)this.items.splice(x,1);if(this.mode!=="db")return this.save();i.comments.forEach(c=>this.w("comments/"+c.id).delete().catch(()=>{}));this.w("internal/"+i.id).delete().catch(()=>{});this.w("deliverables/"+i.id).delete().catch(e=>this.fail(e))},
+  restore(i,x){this.items.splice(x,0,i);if(this.mode!=="db")return this.save();this.put(i);i.comments.forEach(c=>this.w("comments/"+c.id).set(c).catch(()=>{}));if(i.notes)this.setNotes(i,i.notes)},
+  rebuild(){const r=this.raw,by={};r.comments.forEach(c=>(by[c.itemId]=by[c.itemId]||[]).push(c));this.items=r.items.map(d=>({notes:r.notes[d.id]||"",...d,comments:(by[d.id]||[]).sort((a,b)=>a.at-b.at)}))}};
+
+function toast(msg,undo){
+  const t=document.createElement("div");t.className="toast";t.setAttribute("role","status");t.append(msg);
+  if(undo){const b=document.createElement("button");b.textContent="Undo";b.onclick=()=>{undo();t.remove()};t.append(b)}
+  $("#toasts").append(t);setTimeout(()=>t.remove(),undo?5000:2000);
+}
+const hue=s=>[...s].reduce((a,c)=>a*31+c.charCodeAt(0),7)%360;
+const av=n=>`<span class="av" style="background:hsl(${hue(n)} 42% 38%)">${esc((n.trim()[0]||"?").toUpperCase())}</span>`;
+
+function visible(){
+  const {q,client,filter,sort}=S.ui,s=q.trim().toLowerCase(),P={high:0,normal:1,low:2};
+  const out=S.items.filter(i=>(filter==="all"||i.status===filter)&&(client==="all"||i.client===client)&&(!s||[i.title,i.client,i.owner].join(" ").toLowerCase().includes(s)));
+  out.sort((a,b)=>sort==="due"?(a.due||"9").localeCompare(b.due||"9"):sort==="new"?b.created-a.created:sort==="priority"?P[a.priority]-P[b.priority]:a.client.localeCompare(b.client));
+  return out;
+}
+const card=i=>`<article class="card" draggable="${S.canWrite}" tabindex="0" role="button" data-id="${i.id}" aria-label="Open ${esc(i.title)}">
+  <div class="ct">${esc(i.title)}</div><div class="cm">${av(i.client)}<span>${esc(i.client)}</span></div>
+  <div class="cf"><span class="${late(i)?"late":""}">${late(i)?"Overdue · ":"Due "}${fmt(i.due)}</span><span class="sp"></span>
+  <span>${i.comments.filter(c=>c.kind!=="sys").length} comments</span><span class="pr p-${i.priority}" title="${esc(i.priority)} priority"></span></div></article>`;
+const rowItem=i=>`<button class="item" data-id="${i.id}"><b>${esc(i.title)}</b>
+  <span class="m">${esc(i.client)} · ${esc(i.type)} · ${esc(i.owner||"Unassigned")}</span>
+  <span class="r"><span class="pill ${i.status}">${LBL[i.status]}</span><span class="m ${late(i)?"late":""}">${late(i)?"Overdue · ":"Due "}${fmt(i.due)}</span></span></button>`;
+
+function renderStats(){
+  const n=k=>S.items.filter(i=>i.status===k).length,total=S.items.length,done=n("approved"),od=S.items.filter(late).length;
+  const defs=[["all","All deliverables",total],...ST.map(s=>[s.k,s.n,n(s.k)])];
+  $("#stats").innerHTML=defs.map(([k,l,c])=>`<button class="stat ${k} ${S.ui.filter===k?"on":""}" data-f="${k}" aria-pressed="${S.ui.filter===k}"><b>${c}</b><span>${l}</span></button>`).join("")+
+    `<div class="stat"><b class="${od?"late":""}">${od}</b><span>Overdue</span></div>`;
+  const pct=total?Math.round(done/total*100):0;
+  $("#prog").innerHTML=`<span>${done} of ${total} approved</span><div class="bar"><i style="width:${pct}%"></i></div><span>${pct}%</span>`;
+}
+function renderClients(){
+  const cl=[...new Set(S.items.map(i=>i.client))].sort();
+  if(S.ui.client!=="all"&&!cl.includes(S.ui.client))S.ui.client="all";
+  $("#client").innerHTML=`<option value="all">All clients</option>`+cl.map(c=>`<option ${c===S.ui.client?"selected":""}>${esc(c)}</option>`).join("");
+  $$(".seg button").forEach(b=>b.classList.toggle("on",b.dataset.v===S.ui.view));
+  $("#sort").value=S.ui.sort;
+}
+function renderMain(){
+  const v=visible();
+  if(!S.items.length){$("#main").innerHTML=`<div class="list"><div class="empty">${S.loading?"Loading your deliverables…":S.canWrite?`<b style="color:var(--ink);font-size:18px">Start your first review</b><p>Add a deliverable, share this page with your client, and track every round of feedback through to sign-off.</p><button class="btn primary" data-a="new">New deliverable</button> <button class="btn" data-a="demo">Add sample data</button>`:"Nothing here yet."}</div></div>`;return}
+  if(S.ui.view==="list"){
+    $("#main").innerHTML=`<div class="list">${v.length?v.map(rowItem).join(""):`<div class="empty">No matches. Clear the search or choose another status.</div>`}</div>`;return}
+  const cols=ST.filter(s=>S.ui.filter==="all"||s.k===S.ui.filter);
+  $("#main").innerHTML=`<div class="board">${cols.map(s=>{const its=v.filter(i=>i.status===s.k);
+    return `<section class="col" data-st="${s.k}" aria-label="${s.n}"><h3><span style="color:var(--ink)"><i class="dot" style="background:var(--${s.k})"></i>${s.n}</span><span>${its.length}</span></h3>
+    ${its.map(card).join("")||`<div class="empty" style="padding:18px 6px">Drop a card here</div>`}</section>`}).join("")}</div>`;
+}
+function render(){renderClients();renderStats();renderMain();if(S.openId&&$("#drawer").open&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))renderDrawer(true)}
+
+function renderDrawer(keepScroll){
+  const i=S.get(S.openId),d=$("#drawer");if(!i){d.close();return}
+  const y=d.scrollTop,f=(k,l,t="text",x="")=>`<label class="fld ${x}">${l}<input data-f="${k}" type="${t}" value="${esc(i[k])}"></label>`;
+  const link=/^https?:\/\//i.test(i.link||"")?`<a href="${esc(i.link)}" target="_blank" rel="noopener">Open file</a>`:"";
+  d.innerHTML=`<div class="dh"><span class="saved" id="saved"></span><button class="btn ghost" data-a="close">Close</button></div><div class="db">
+  <input class="tin" data-f="title" value="${esc(i.title)}" aria-label="Title">
+  <div class="stseg">${ST.map(s=>`<button class="${s.k} ${i.status===s.k?"on":""}" data-st="${s.k}">${s.n}</button>`).join("")}</div>
+  <div class="grid">${f("client","Client","text")}
+  <label class="fld">Type<select data-f="type">${TYPES.map(t=>`<option ${t===i.type?"selected":""}>${t}</option>`).join("")}</select></label>
+  ${f("owner","Owner")}${f("due","Due date","date")}
+  <label class="fld">Priority<select data-f="priority">${["high","normal","low"].map(p=>`<option value="${p}" ${p===i.priority?"selected":""}>${p[0].toUpperCase()+p.slice(1)}</option>`).join("")}</select></label>
+  <div class="fld">${f("link","File link","url","full").replace('class="fld full"','class="fld"')}${link}</div>
+  ${S.isAdmin?`<label class="fld full">Internal notes<textarea data-f="notes" placeholder="Private to editors, hidden from clients">${esc(i.notes)}</textarea></label>`:""}</div>
+  <strong>Comments</strong><div class="thread">${i.comments.map(c=>`<div class="c ${c.kind}"><small>${esc(c.who)} · ${fmtT(c.at)}</small>${esc(c.text)}</div>`).join("")}</div>
+  <div class="grid"><label class="fld">Commenting as<select id="ck"><option value="agency">Agency</option><option value="client">Client</option></select></label>
+  <label class="fld">Name<input id="cw" value="${esc(ls.get("rd.name")||"")}" placeholder="Your name"></label>
+  <label class="fld full">Comment<textarea id="ct" placeholder="What needs attention? (Ctrl+Enter to post)"></textarea></label></div>
+  <div class="row"><button class="btn primary" data-a="comment">Add comment</button><span style="flex:1"></span><button class="btn danger ghost" data-a="delete">Delete</button></div></div>`;
+  d.scrollTop=keepScroll?y:0;if(!S.canWrite)$$("input,select,textarea,button[data-st],[data-a=comment],[data-a=delete]",d).forEach(x=>x.disabled=true);
+}
+function openDrawer(id){S.openId=id;const d=$("#drawer");renderDrawer();if(!d.open)d.showModal()}
+function closeDrawer(){S.openId=null;$("#drawer").close()}
+
+function quickAdd(){
+  const d=$("#quick"),cl=[...new Set(S.items.map(i=>i.client))];
+  d.innerHTML=`<div class="dh"><h2 style="margin:0">New deliverable</h2><button class="btn ghost" data-a="qclose">Close</button></div><form class="db" id="qf" style="display:grid;gap:10px">
+  <label class="fld">Title<input name="title" required placeholder="e.g. Brand video, final cut"></label>
+  <label class="fld">Client<input name="client" required list="cl" placeholder="Client name"></label><datalist id="cl">${cl.map(c=>`<option value="${esc(c)}">`).join("")}</datalist>
+  <label class="fld">Due date<input name="due" type="date" value="${inDays(7)}"></label>
+  <button class="btn primary">Add and keep editing</button></form>`;
+  d.showModal();$("[name=title]",d).focus();
+  $("#qf").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target),t=f.get("title").trim(),c=f.get("client").trim();if(!t||!c)return;
+    const i={id:uid(),title:t,client:c,type:"Design",owner:"",due:f.get("due"),status:"review",priority:"normal",notes:"",link:"",created:Date.now(),comments:[]};
+    S.create(i);d.close();render();openDrawer(i.id)};
+}
+function download(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.append(a);a.click();a.remove()}
+const dataActions={
+  csv(){const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+    download("review-desk.csv",[["Title","Client","Type","Owner","Due","Status","Priority","Comments","Link"],...S.items.map(i=>[i.title,i.client,i.type,i.owner,i.due,LBL[i.status],i.priority,i.comments.filter(c=>c.kind!=="sys").length,i.link])].map(r=>r.map(q).join(",")).join("\n"),"text/csv")},
+  json(){download("review-desk-backup.json",JSON.stringify(S.items,null,2),"application/json")},
+  import(){$("#file").click()},
+  demo(){if(S.items.length&&!confirm("Add sample deliverables to your list?"))return;seed().forEach(x=>{const cm=x.comments,n=x.notes;x.comments=[];S.items.push(x);S.put(x);cm.forEach(c=>S.comment(x,c));if(n&&S.isAdmin)S.setNotes(x,n)});S.save();render();toast("Sample data added")},
+  clear(){if(confirm("Delete all deliverables? You can undo right after.")){const old=S.items;S.items=[];S.save();render();toast("Cleared",()=>{S.items=old;S.save();render()})}}
+};
+
+document.addEventListener("click",e=>{
+  const t=e.target,a=t.closest("[data-a]")?.dataset.a;
+  if(a&&dataActions[a]){$("#data").open=false;return dataActions[a]()}
+  if(a==="close")return closeDrawer();
+  if(a==="new")return quickAdd();
+  if(a==="cclose")return $("#cfgdlg").close();
+  if(a==="qclose")return $("#quick").close();
+  const i=S.get(S.openId);
+  if(a==="delete"&&i){if(confirm("Delete this deliverable and its comments?")){const idx=S.items.indexOf(i);S.del(i);closeDrawer();render();toast("Deleted",()=>{S.restore(i,idx);render()})}return}
+  if(a==="comment"&&i){const text=$("#ct").value.trim();if(!text)return $("#ct").focus();
+    const kind=$("#ck").value,who=$("#cw").value.trim()||(kind==="client"?"Client":"Agency");ls.set("rd.name",$("#cw").value.trim());
+    S.comment(i,{kind,who,text});$("#ct").value="";render();return}
+  const st=t.closest("[data-st]");if(st&&i&&st.closest(".stseg")){S.setStatus(i,st.dataset.st);render();return}
+  if(t.id==="drawer"||t.id==="quick"||t.id==="cfgdlg")return t.close(),t.id==="drawer"&&(S.openId=null);
+  const f=t.closest(".stat[data-f]");if(f){S.ui.filter=f.dataset.f;S.save();return render()}
+  const v=t.closest(".seg button");if(v){S.ui.view=v.dataset.v;S.save();return render()}
+  const it=t.closest(".card,.item");if(it)openDrawer(it.dataset.id);
+});
+document.addEventListener("change",e=>{
+  const t=e.target,i=S.get(S.openId);
+  if(t.dataset.f&&i&&$("#drawer").contains(t)){
+    let v=t.value.trim();
+    if((t.dataset.f==="title"||t.dataset.f==="client")&&!v){t.value=i[t.dataset.f];return toast("Title and client can’t be empty")}
+    if(t.dataset.f==="notes")S.setNotes(i,v);else{i[t.dataset.f]=v;S.put(i)}renderClients();renderStats();renderMain();
+    const s=$("#saved");s.textContent="Saved";setTimeout(()=>s.textContent="",1200);return}
+  if(t.id==="client"){S.ui.client=t.value;S.save();renderMain()}
+  if(t.id==="sort"){S.ui.sort=t.value;S.save();renderMain()}
+  if(t.id==="file"&&t.files[0]){const r=new FileReader();r.onload=()=>{try{const arr=JSON.parse(r.result);
+    if(!Array.isArray(arr)||arr.some(x=>!x||typeof x.title!=="string"||typeof x.client!=="string"))throw 0;
+    const old=S.items;S.items=arr.map(x=>({id:uid(),title:x.title,client:x.client,type:x.type||"Other",owner:x.owner||"",due:x.due||"",
+      status:LBL[x.status]?x.status:"review",priority:["high","normal","low"].includes(x.priority)?x.priority:"normal",notes:x.notes||"",link:x.link||"",
+      created:+x.created||Date.now(),comments:Array.isArray(x.comments)?x.comments.map(c=>({id:uid(),kind:["agency","client","sys"].includes(c.kind)?c.kind:"agency",who:String(c.who||""),text:String(c.text||""),at:+c.at||Date.now()})):[]}));
+    S.save();render();toast(`Restored ${S.items.length} deliverables`,()=>{S.items=old;S.save();render()})}catch(err){toast("That file isn’t a Review Desk backup")}t.value=""};r.readAsText(t.files[0])}
+});
+$("#q").addEventListener("input",e=>{S.ui.q=e.target.value;renderMain()});
+$("#new").onclick=quickAdd;
+$("#theme").onclick=()=>{const dark=matchMedia("(prefers-color-scheme:dark)").matches,cur=document.documentElement.dataset.theme||(dark?"dark":"light"),n=cur==="dark"?"light":"dark";document.documentElement.dataset.theme=n;ls.set(THEME,n)};
+document.addEventListener("keydown",e=>{
+  const typing=/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)&&document.activeElement.id==="ct")return $("[data-a=comment]").click();
+  if(e.key==="Enter"&&document.activeElement.classList.contains("card"))return document.activeElement.click();
+  if(e.key==="Enter"&&document.activeElement.classList.contains("tin"))return document.activeElement.blur();
+  if(typing||e.ctrlKey||e.metaKey||$("dialog[open]"))return;
+  if(e.key==="n"||e.key==="N"){e.preventDefault();quickAdd()}
+  if(e.key==="/"){e.preventDefault();$("#q").focus()}
+});
+$("#drawer").addEventListener("close",()=>S.openId=null);
+let dragId=null;
+document.addEventListener("dragstart",e=>{const c=e.target.closest?.(".card");if(!c)return;dragId=c.dataset.id;c.classList.add("drag");e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",dragId)});
+document.addEventListener("dragend",()=>{dragId=null;$$(".drag,.over").forEach(x=>x.classList.remove("drag","over"))});
+document.addEventListener("dragover",e=>{const c=e.target.closest?.(".col");if(c&&dragId){e.preventDefault();$$(".over").forEach(x=>x!==c&&x.classList.remove("over"));c.classList.add("over")}});
+document.addEventListener("drop",e=>{const c=e.target.closest?.(".col"),i=S.get(dragId);if(!c||!i)return;e.preventDefault();
+  const prev=i.status,st=c.dataset.st;if(prev!==st){S.setStatus(i,st);render();toast(`Moved to ${LBL[st]}`,()=>{S.setStatus(i,prev);render()})}});
+
+const th=ls.get(THEME);if(th)document.documentElement.dataset.theme=th;
+
+const chip=(t,c)=>{const e=$("#chip");e.textContent=t;e.className="chip "+(c||"")};
+function applyBrand(b){b=b||{};$("#brand").textContent=b.name||"Review Desk";document.title=b.name||"Review Desk";const r=document.documentElement.style;
+  if(/^#[0-9a-f]{6}$/i.test(b.color||"")){r.setProperty("--brand",b.color);r.setProperty("--brand-on","#fff")}else{r.removeProperty("--brand");r.removeProperty("--brand-on")}}
+function openSettings(){const d=$("#cfgdlg"),b=S.brand||{};
+  d.innerHTML=`<div class="dh"><h2 style="margin:0">Workspace settings</h2><button class="btn ghost" data-a="cclose">Close</button></div><form class="db" id="cf" style="display:grid;gap:10px"><label class="fld">Agency name<input name="name" maxlength="40" value="${esc(b.name||"")}" placeholder="Review Desk"></label><label class="fld">Brand colour<input name="color" type="color" value="${esc(b.color||"#17302b")}"></label><button class="btn primary">Save</button></form>`;
+  d.showModal();
+  $("#cf").onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);S.brand={name:f.get("name").trim(),color:f.get("color")};applyBrand(S.brand);
+    if(S.mode==="db")S.w("settings/main").set(S.brand).catch(x=>S.fail(x));else ls.set(BKEY,JSON.stringify(S.brand));d.close();toast("Saved")}}
+$("#cfg").onclick=openSettings;
+(async()=>{
+  let db=null,user=null;
+  try{db=await claude.use("db");user=await claude.use("user")}catch(e){}
+  S.load();
+  if(!db){chip("Saved on this device only");try{S.brand=JSON.parse(ls.get(BKEY))}catch(e){}applyBrand(S.brand);$("#cfg").hidden=false;render();return}
+  S.mode="db";S.db=db;S.items=[];S.loading=true;document.body.classList.add("shared");
+  try{S.canWrite=(await user?.can("data.write"))!==false;S.isAdmin=!!(await user?.canEdit())}catch(e){}
+  $("#new").hidden=!S.canWrite;$("#cfg").hidden=!S.isAdmin;chip(S.canWrite?"Connecting…":"View only");render();
+  const live=()=>{S.loading=false;S.rebuild();chip(S.canWrite?"Live · shared":"View only · live",S.canWrite?"live":"");render()};
+  const sub=(p,fn)=>db.collection(p).onSnapshot(s=>{fn(s.docs.map(d=>({...d.data(),id:d.id})));live()},()=>{S.loading=false;chip("Offline");render()});
+  sub("deliverables",a=>{S.raw.items=a});sub("comments",a=>{S.raw.comments=a});
+  if(S.isAdmin)sub("internal",a=>{S.raw.notes=Object.fromEntries(a.map(x=>[x.id,x.notes]))});
+  db.doc("settings/main").onSnapshot(x=>{S.brand=x.exists?x.data():null;applyBrand(S.brand)},()=>{});
+  setTimeout(()=>{if(S.loading){S.loading=false;chip("Still connecting…");render()}},10000);
+})();
+})();
+</script>
+</body>
+</html>
